@@ -45,15 +45,15 @@ export default function ProjectionTimer({ timer, onUpdateTime }: ProjectionTimer
 
   const getBackgroundColor = () => {
     if (timer.status === 'finished') {
-      return 'bg-destructive/90 border-destructive';
+      return 'bg-destructive/90 border-destructive text-destructive-foreground';
     }
     if (timer.status === 'running') {
       const percentage = (timer.currentTime / timer.initialTime) * 100;
-      if (percentage > 50) return 'bg-primary/90 border-primary';
-      if (percentage > 20) return 'bg-orange-500/90 border-orange-500';
-      return 'bg-red-500/90 border-red-500';
+      if (percentage > 50) return 'bg-card border-border text-foreground';
+      if (percentage > 20) return 'bg-orange-500/90 border-orange-500 text-white';
+      return 'bg-red-500/90 border-red-500 text-white';
     }
-    return 'bg-secondary/90 border-secondary';
+    return 'bg-secondary/90 border-secondary text-secondary-foreground';
   };
 
   const getStatusIcon = () => {
