@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { TimerState } from '../hooks/useTimerSync';
+import { Play, Pause, Square, RotateCcw, Trash2, Check, X } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface ControlTimerProps {
   timer: TimerState;
@@ -64,18 +66,37 @@ export default function ControlTimer({
 
   const getStatusColor = () => {
     if (timer.status === 'finished') {
-      return 'bg-red-100 border-red-500 dark:bg-red-950 dark:border-red-700';
+      return 'bg-destructive/5 border-destructive';
     }
     const percentage = (timer.currentTime / timer.initialTime) * 100;
-    if (percentage > 50) return 'bg-green-100 border-green-500 dark:bg-green-950 dark:border-green-700';
-    if (percentage > 20) return 'bg-yellow-100 border-yellow-500 dark:bg-yellow-950 dark:border-yellow-700';
-    return 'bg-orange-100 border-orange-500 dark:bg-orange-950 dark:border-orange-700';
+    if (percentage > 50) return 'bg-primary/5 border-primary';
+    if (percentage > 20) return 'bg-orange-500/5 border-orange-500';
+    return 'bg-red-500/5 border-red-500';
   };
 
   const getStatusBadge = () => {
-    if (timer.status === 'running') return <span className="text-xs font-semibold px-2 py-1 bg-blue-500 text-white rounded">▶️ EM EXECUÇÃO</span>;
-    if (timer.status === 'finished') return <span className="text-xs font-semibold px-2 py-1 bg-red-500 text-white rounded">⏹️ TERMINADO</span>;
-    return <span className="text-xs font-semibold px-2 py-1 bg-gray-500 text-white rounded">⏸️ PAUSADO</span>;
+    if (timer.status === 'running') {
+      return (
+        <Badge variant="default">
+          <Play className="w-3 h-3 mr-1" />
+          EM EXECUÇÃO
+        </Badge>
+      );
+    }
+    if (timer.status === 'finished') {
+      return (
+        <Badge variant="destructive">
+          <Square className="w-3 h-3 mr-1" />
+          TERMINADO
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant="secondary">
+        <Pause className="w-3 h-3 mr-1" />
+        PAUSADO
+      </Badge>
+    );
   };
 
   return (
@@ -88,20 +109,24 @@ export default function ControlTimer({
                 type="text"
                 value={tempName}
                 onChange={(e) => setTempName(e.target.value)}
-                className="flex-1 px-2 py-1 text-sm border-2 border-gray-300 rounded focus:outline-none focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                className="flex-1 px-2 py-1 text-sm border-2 border-input rounded focus:outline-none focus:border-primary bg-background text-foreground"
                 autoFocus
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleSaveName();
                   if (e.key === 'Escape') setIsEditing(false);
                 }}
               />
-              <button onClick={handleSaveName} className="px-2 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600">✓</button>
-              <button onClick={() => setIsEditing(false)} className="px-2 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">✕</button>
+              <button onClick={handleSaveName} className="px-2 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 flex items-center justify-center">
+                <Check className="w-4 h-4" />
+              </button>
+              <button onClick={() => setIsEditing(false)} className="px-2 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600 flex items-center justify-center">
+                <X className="w-4 h-4" />
+              </button>
             </div>
           ) : (
             <h3
               onClick={() => setIsEditing(true)}
-              className="text-lg font-semibold text-gray-800 dark:text-gray-200 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400"
+              className="text-lg font-semibold text-foreground cursor-pointer hover:text-primary"
               title="Clique para editar"
             >
               {timer.name}
@@ -112,10 +137,10 @@ export default function ControlTimer({
       </div>
 
       <div className="text-center mb-3">
-        <div className={`text-4xl font-bold font-mono ${timer.status === 'finished' ? 'text-red-600 dark:text-red-400 animate-pulse' : 'text-gray-800 dark:text-gray-200'}`}>
+        <div className={`text-4xl font-bold font-mono ${timer.status === 'finished' ? 'text-destructive animate-pulse' : 'text-foreground'}`}>
           {formatTime(timer.currentTime)}
         </div>
-        <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+        <div className="text-xs text-muted-foreground mt-1">
           Tempo inicial: {formatTime(timer.initialTime)}
         </div>
       </div>
@@ -124,25 +149,33 @@ export default function ControlTimer({
         <button
           onClick={() => onToggle(timer.id)}
           disabled={timer.status === 'finished'}
-          className={`flex-1 px-3 py-2 rounded text-sm font-semibold transition-colors ${
+          className={`flex-1 px-3 py-2 rounded text-sm font-semibold transition-colors flex items-center justify-center gap-1 ${
             timer.status === 'running'
               ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
               : 'bg-blue-500 hover:bg-blue-600 text-white disabled:bg-gray-400 disabled:cursor-not-allowed'
           }`}
         >
-          {timer.status === 'running' ? '⏸️ Pausar' : '▶️ Iniciar'}
+          {timer.status === 'running' ? (
+            <>
+              <Pause className="w-4 h-4" /> Pausar
+            </>
+          ) : (
+            <>
+              <Play className="w-4 h-4" /> Iniciar
+            </>
+          )}
         </button>
         <button
           onClick={() => onReset(timer.id)}
-          className="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded text-sm font-semibold transition-colors"
+          className="px-3 py-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded text-sm font-semibold transition-colors flex items-center justify-center gap-1"
         >
-          🔄 Reset
+          <RotateCcw className="w-4 h-4" /> Reset
         </button>
         <button
           onClick={() => onDelete(timer.id)}
-          className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded text-sm font-semibold transition-colors"
+          className="px-3 py-2 bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded text-sm font-semibold transition-colors flex items-center justify-center"
         >
-          🗑️
+          <Trash2 className="w-4 h-4" />
         </button>
       </div>
     </div>

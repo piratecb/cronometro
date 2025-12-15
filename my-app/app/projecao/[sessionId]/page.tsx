@@ -5,6 +5,10 @@ import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import ProjectionTimer from '../../components/ProjectionTimer';
 import { useTimerSyncSupabase } from '../../hooks/useTimerSyncSupabase';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { BarChart3, Settings, Clock, CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
 
 export default function ProjectionPage() {
   const params = useParams();
@@ -39,51 +43,57 @@ export default function ProjectionPage() {
   const finishedTimers = timers.filter((t) => t.status === 'finished');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white p-6 md:p-12">
-      <div className="max-w-[1920px] mx-auto">
+    <div className="min-h-screen bg-background text-foreground p-6 md:p-12">
+      <div className="max-w-[1920px] mx-auto space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-2">📊 Projeção de Cronómetros</h1>
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <BarChart3 className="w-10 h-10" />
+              <h1 className="text-4xl md:text-5xl font-bold">Projeção de Cronómetros</h1>
+            </div>
             <div className="flex items-center gap-4">
-              <p className="text-xl text-gray-300">
+              <p className="text-xl text-muted-foreground">
                 Sessão: <span className="font-mono font-bold">{sessionId}</span>
               </p>
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}
-                ></div>
-                <span className="text-sm">{isConnected ? 'Sincronizado' : 'Offline'}</span>
-              </div>
+              <Badge variant={isConnected ? "default" : "destructive"} className="gap-2">
+                <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-white animate-pulse' : 'bg-white'}`} />
+                {isConnected ? 'Sincronizado' : 'Offline'}
+              </Badge>
             </div>
           </div>
-          <Link
-            href={`/sessao/${sessionId}`}
-            className="px-6 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg font-semibold transition-all border border-white/20"
-          >
-            ⚙️ Controlo
-          </Link>
+          <Button variant="secondary" size="lg" asChild>
+            <Link href={`/sessao/${sessionId}`}>
+              <Settings className="w-5 h-5 mr-2" />
+              Controlo
+            </Link>
+          </Button>
         </div>
 
         {timers.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[70vh]">
-            <div className="text-9xl mb-8">⏱️</div>
-            <h2 className="text-4xl font-bold mb-4">Nenhum Cronómetro Ativo</h2>
-            <p className="text-2xl text-gray-300 mb-8">Adicione cronómetros na página de controlo</p>
-            <Link
-              href={`/sessao/${sessionId}`}
-              className="px-8 py-4 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold text-xl transition-all transform hover:scale-105"
-            >
-              Ir para Controlo
-            </Link>
-          </div>
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-20 space-y-6">
+              <Clock className="w-32 h-32 text-muted-foreground" />
+              <div className="text-center space-y-3">
+                <h2 className="text-4xl font-bold">Nenhum Cronómetro Ativo</h2>
+                <p className="text-2xl text-muted-foreground">Adicione cronómetros na página de controlo</p>
+              </div>
+              <Button size="lg" asChild className="mt-4">
+                <Link href={`/sessao/${sessionId}`}>
+                  <ArrowRight className="w-5 h-5 mr-2" />
+                  Ir para Controlo
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
         ) : (
           <>
             {/* Cronómetros Ativos */}
             {activeTimers.length > 0 && (
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4 text-green-400">
-                  ✅ Cronómetros Ativos ({activeTimers.length})
+              <div className="space-y-4">
+                <h2 className="text-2xl font-semibold flex items-center gap-2 text-primary">
+                  <CheckCircle2 className="w-6 h-6" />
+                  Cronómetros Ativos ({activeTimers.length})
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {activeTimers.map((timer) => (
@@ -95,9 +105,10 @@ export default function ProjectionPage() {
 
             {/* Cronómetros Terminados */}
             {finishedTimers.length > 0 && (
-              <div>
-                <h2 className="text-2xl font-semibold mb-4 text-red-400">
-                  ⏹️ Cronómetros Terminados ({finishedTimers.length})
+              <div className="space-y-4">
+                <h2 className="text-2xl font-semibold flex items-center gap-2 text-destructive">
+                  <XCircle className="w-6 h-6" />
+                  Cronómetros Terminados ({finishedTimers.length})
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {finishedTimers.map((timer) => (
@@ -110,13 +121,21 @@ export default function ProjectionPage() {
         )}
 
         {/* Footer com informações */}
-        <div className="fixed bottom-4 right-4 bg-black/40 backdrop-blur-md rounded-lg px-6 py-3 border border-white/20">
-          <div className="text-sm">
-            <span className="font-semibold">Total:</span> {timers.length} |
-            <span className="font-semibold ml-2 text-green-400">Ativos:</span> {activeTimers.length} |
-            <span className="font-semibold ml-2 text-red-400">Terminados:</span> {finishedTimers.length}
-          </div>
-        </div>
+        <Card className="fixed bottom-4 right-4 border-border backdrop-blur-md">
+          <CardContent className="py-3 px-6">
+            <div className="text-sm flex items-center gap-4">
+              <span className="font-semibold">Total: {timers.length}</span>
+              <span className="flex items-center gap-1 text-primary">
+                <CheckCircle2 className="w-3 h-3" />
+                Ativos: {activeTimers.length}
+              </span>
+              <span className="flex items-center gap-1 text-destructive">
+                <XCircle className="w-3 h-3" />
+                Terminados: {finishedTimers.length}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -2,6 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Clock, Plus, LogIn, RotateCcw, Lightbulb } from 'lucide-react';
 
 export default function HomePage() {
   const [sessionId, setSessionId] = useState('');
@@ -37,78 +43,113 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-white mb-3">⏱️ Cronómetros</h1>
-          <p className="text-xl text-blue-100">Gestão de Múltiplos Temporizadores</p>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="max-w-md w-full space-y-6">
+        <div className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <Clock className="w-12 h-12 text-primary" />
+            <h1 className="text-5xl font-bold text-foreground">Cronómetros</h1>
+          </div>
+          <p className="text-xl text-muted-foreground">Gestão de Múltiplos Temporizadores</p>
+          <p className="text-sm text-muted-foreground">Sincronização em tempo real entre dispositivos</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-2xl p-8 space-y-6">
-          {/* Criar Nova Sessão */}
-          <div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">Nova Sessão</h2>
-            <button
-              onClick={createNewSession}
-              className="w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-semibold shadow-lg transition-all transform hover:scale-105"
-            >
-              ➕ Criar Nova Sessão
-            </button>
-            <p className="text-sm text-gray-500 mt-2">
+        <Card className="shadow-2xl border-0">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Plus className="w-5 h-5" />
+              Nova Sessão
+            </CardTitle>
+            <CardDescription>
               Cria uma nova sessão com código único para partilhar
-            </p>
-          </div>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              onClick={createNewSession}
+              className="w-full"
+              size="lg"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Criar Nova Sessão
+            </Button>
+          </CardContent>
+        </Card>
 
-          <div className="border-t border-gray-200"></div>
+        <Separator />
 
-          {/* Entrar em Sessão Existente */}
-          <div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">Entrar numa Sessão</h2>
-            <div className="space-y-3">
-              <input
+        <Card className="shadow-2xl border-0">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <LogIn className="w-5 h-5" />
+              Entrar numa Sessão
+            </CardTitle>
+            <CardDescription>
+              Entre numa sessão existente usando o código partilhado
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="session-code">Código da Sessão</Label>
+              <Input
+                id="session-code"
                 type="text"
                 value={sessionId}
                 onChange={(e) => setSessionId(e.target.value.toUpperCase())}
-                placeholder="Digite o código da sessão"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-center text-lg font-mono tracking-wider"
+                placeholder="Ex: ABC123XY"
+                className="text-center text-lg font-mono tracking-wider"
                 maxLength={8}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') joinSession(sessionId);
                 }}
               />
-              <button
-                onClick={() => joinSession(sessionId)}
-                disabled={!sessionId.trim()}
-                className="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg font-semibold shadow-lg transition-all disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed"
-              >
-                🔗 Entrar na Sessão
-              </button>
             </div>
-            <p className="text-sm text-gray-500 mt-2">
-              Entre numa sessão existente usando o código partilhado
-            </p>
-          </div>
+            <Button
+              onClick={() => joinSession(sessionId)}
+              disabled={!sessionId.trim()}
+              className="w-full"
+              size="lg"
+              variant="secondary"
+            >
+              <LogIn className="w-4 h-4 mr-2" />
+              Entrar na Sessão
+            </Button>
+          </CardContent>
+        </Card>
 
-          {/* Continuar Última Sessão */}
-          {existingSessionId && (
-            <>
-              <div className="border-t border-gray-200"></div>
-              <div>
-                <h2 className="text-lg font-semibold text-gray-800 mb-3">Sessão Recente</h2>
-                <button
+        {existingSessionId && (
+          <>
+            <Separator />
+            
+            <Card className="shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <RotateCcw className="w-5 h-5" />
+                  Sessão Recente
+                </CardTitle>
+                <CardDescription>
+                  Continue de onde parou
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
                   onClick={continueLastSession}
-                  className="w-full px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-lg font-semibold shadow-lg transition-all"
+                  className="w-full"
+                  size="lg"
+                  variant="outline"
                 >
-                  🔄 Continuar Sessão {existingSessionId}
-                </button>
-              </div>
-            </>
-          )}
-        </div>
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Continuar Sessão {existingSessionId}
+                </Button>
+              </CardContent>
+            </Card>
+          </>
+        )}
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-blue-100">
-            💡 Partilhe o código da sessão com outros dispositivos para sincronização em tempo real
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground leading-relaxed flex items-center justify-center gap-2">
+            <Lightbulb className="w-4 h-4" /> 
+            Partilhe o código da sessão com outros dispositivos para sincronização em tempo real
           </p>
         </div>
       </div>

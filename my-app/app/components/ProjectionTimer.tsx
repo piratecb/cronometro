@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { TimerState } from '../hooks/useTimerSync';
+import { Play, Pause, Square, Bell } from 'lucide-react';
 
 interface ProjectionTimerProps {
   timer: TimerState;
@@ -44,28 +45,28 @@ export default function ProjectionTimer({ timer, onUpdateTime }: ProjectionTimer
 
   const getBackgroundColor = () => {
     if (timer.status === 'finished') {
-      return 'bg-gradient-to-br from-red-500 to-red-700';
+      return 'bg-destructive/90 border-destructive';
     }
     if (timer.status === 'running') {
       const percentage = (timer.currentTime / timer.initialTime) * 100;
-      if (percentage > 50) return 'bg-gradient-to-br from-green-500 to-green-700';
-      if (percentage > 20) return 'bg-gradient-to-br from-yellow-500 to-yellow-700';
-      return 'bg-gradient-to-br from-orange-500 to-orange-700';
+      if (percentage > 50) return 'bg-primary/90 border-primary';
+      if (percentage > 20) return 'bg-orange-500/90 border-orange-500';
+      return 'bg-red-500/90 border-red-500';
     }
-    return 'bg-gradient-to-br from-gray-500 to-gray-700';
+    return 'bg-secondary/90 border-secondary';
   };
 
   const getStatusIcon = () => {
-    if (timer.status === 'running') return '▶️';
-    if (timer.status === 'finished') return '⏹️';
-    return '⏸️';
+    if (timer.status === 'running') return <Play className="w-10 h-10" />;
+    if (timer.status === 'finished') return <Square className="w-10 h-10" />;
+    return <Pause className="w-10 h-10" />;
   };
 
   return (
-    <div className={`${getBackgroundColor()} rounded-3xl p-8 shadow-2xl text-white transition-all duration-500 transform ${timer.status === 'finished' ? 'animate-pulse scale-105' : ''}`}>
+    <div className={`${getBackgroundColor()} border-2 rounded-2xl p-8 shadow-lg transition-all duration-500 transform ${timer.status === 'finished' ? 'animate-pulse scale-105' : ''}`}>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-3xl md:text-4xl font-bold truncate flex-1">{timer.name}</h2>
-        <span className="text-4xl ml-4">{getStatusIcon()}</span>
+        <div className="ml-4">{getStatusIcon()}</div>
       </div>
       
       <div className="text-center">
@@ -74,8 +75,9 @@ export default function ProjectionTimer({ timer, onUpdateTime }: ProjectionTimer
         </div>
         
         {timer.status === 'finished' && (
-          <div className="text-3xl md:text-4xl font-bold mt-6 animate-bounce">
-            ⏰ TEMPO ESGOTADO!
+          <div className="text-3xl md:text-4xl font-bold mt-6 animate-bounce flex items-center justify-center gap-3">
+            <Bell className="w-10 h-10" />
+            TEMPO ESGOTADO!
           </div>
         )}
         
