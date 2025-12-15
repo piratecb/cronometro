@@ -2,9 +2,25 @@
 
 Aplicação web para gerir múltiplos cronómetros simultaneamente, ideal para apresentações de equipa, debates ou assembleias onde é necessário controlar o tempo de intervenção de diferentes participantes.
 
+## 🌐 Sincronização entre Dispositivos
+
+✅ **Funciona entre múltiplos dispositivos** (computador, tablet, telemóvel)
+- Sincronização em tempo real via Supabase
+- Cada sessão tem um código único para partilhar
+- Vários dispositivos podem controlar e visualizar simultaneamente
+- Perfeito para projetar numa tela enquanto controla de outro dispositivo
+
+⚠️ **Requer configuração do Supabase** - veja [SUPABASE_SETUP.md](SUPABASE_SETUP.md)
+
 ## ✨ Funcionalidades
 
 ### 📋 Página de Controlo
+- **Sistema de Sessões**
+  - 🆕 Criar sessões únicas com código para partilhar
+  - 🔗 Entrar em sessões existentes usando código
+  - 📤 Partilhar código/link da sessão com outros dispositivos
+  - 🔄 Continuar última sessão automaticamente
+
 - **Gestão de Cronómetros**
   - ➕ Criar múltiplos cronómetros numa mesma sessão
   - 🏷️ Nome/identificador personalizável (ex: "Equipa A", "Orador 1")
@@ -35,12 +51,21 @@ Aplicação web para gerir múltiplos cronómetros simultaneamente, ideal para a
     - Vermelho pulsante: Tempo esgotado
 
 - **Sincronização**
-  - ⚡ Qualquer alteração na página de controlo reflete imediatamente na projeção
-  - 📱 Múltiplos dispositivos podem visualizar simultaneamente
-  - 🔄 Sincronização automática entre abas e janelas
-  - 💾 Estado persistente (mantém dados após atualizar página)
+  - ⚡ Sincronização em tempo real via Supabase Realtime (WebSocket)
+  - 📱 Funciona entre qualquer número de dispositivos diferentes
+  - 🔄 Atualização instantânea quando qualquer dispositivo faz alterações
+  - 💾 Backup local no localStorage de cada dispositivo
+  - 🟢 Indicador visual de status de conexão
 
 ## 🚀 Como Usar
+
+### Configuração Inicial
+
+**⚠️ IMPORTANTE: Configure o Supabase primeiro!**
+
+1. Siga o guia completo em [SUPABASE_SETUP.md](SUPABASE_SETUP.md)
+2. Crie um projeto gratuito no Supabase
+3. Configure as variáveis de ambiente
 
 ### Instalação e Execução
 
@@ -55,30 +80,40 @@ Aplicação web para gerir múltiplos cronómetros simultaneamente, ideal para a
    ```
 
 3. **Abrir no navegador**
-   - Página de Controlo: http://localhost:3000
-   - Página de Projeção: http://localhost:3000/projecao
+   - Página Inicial: http://localhost:3000
 
-### Fluxo de Trabalho Recomendado
+### Fluxo de Trabalho
 
-1. **Preparação**
-   - Abra a página de controlo no seu computador/tablet
-   - Abra a página de projeção num segundo monitor ou projete para o público
+1. **Criar ou Entrar numa Sessão**
+   - Na página inicial, clique em "Criar Nova Sessão"
+   - Ou insira o código de uma sessão existente para entrar
 
-2. **Adicionar Cronómetros**
+2. **Partilhar com Outros Dispositivos**
+   - Clique no botão "📤 Partilhar" na página de controlo
+   - Copie o código ou link da sessão
+   - Abra em outros dispositivos (computador, tablet, telemóvel)
+   - Todos os dispositivos ficarão sincronizados em tempo real!
+
+3. **Adicionar Cronómetros**
    - Clique em "➕ Adicionar Cronómetro"
    - Insira o nome do participante (ex: "Equipa A", "Orador 1")
    - Configure o tempo em minutos
    - Clique em "Criar"
 
-3. **Controlar Sessão**
+4. **Abrir Página de Projeção**
+   - Clique em "🖥️ Abrir Página de Projeção"
+   - Projete esta página numa tela para o público ver
+   - Controle tudo de qualquer dispositivo conectado à sessão
+
+5. **Controlar Sessão**
    - Use os botões individuais para iniciar/pausar cada cronómetro
-   - A página de projeção atualiza automaticamente
+   - Todos os dispositivos veem as mudanças instantaneamente
    - Use "Pausar Todos" para uma pausa geral
    - Use "Reset Geral" para reiniciar todos os cronómetros
 
-4. **Durante Apresentação**
-   - O público vê apenas a página de projeção (design limpo)
-   - Você controla tudo pela página de controlo
+6. **Visualização**
+   - A página de projeção mostra apenas os cronómetros (design limpo)
+   - Qualquer dispositivo pode controlar
    - Indicadores visuais claros para tempo restante
    - Alerta pulsante quando tempo esgota
 
@@ -117,29 +152,35 @@ Aplicação web para gerir múltiplos cronómetros simultaneamente, ideal para a
 - **Next.js 16** - Framework React
 - **TypeScript** - Tipagem estática
 - **Tailwind CSS** - Estilização
-- **LocalStorage API** - Sincronização entre abas
-- **React Hooks** - Gestão de estado
+- **Supabase** - Backend e sincronização em tempo real
+- **Supabase Realtime** - WebSocket para updates instantâneos
+- **LocalStorage API** - Backup local
 
 ## 📱 Compatibilidade
 
 - ✅ Desktop (Windows, macOS, Linux)
 - ✅ Tablet (iPad, Android)
+- ✅ Smartphone (iOS, Android)
 - ✅ Modo claro e escuro automático
-- ✅ Múltiplas abas/janelas sincronizadas
-- ✅ Atualização em tempo real
+- ✅ Sincronização entre dispositivos diferentes
+- ✅ Múltiplas sessões simultâneas
+- ✅ Atualização em tempo real via WebSocket
 
-## 🔒 Privacidade
+## 🔒 Privacidade e Segurança
 
-- Todos os dados são armazenados localmente no navegador
-- Não há envio de informações para servidores externos
-- Funciona offline após carregamento inicial
+- Cada sessão tem um código único gerado aleatoriamente
+- Apenas quem tem o código pode acessar a sessão
+- Dados sincronizados via Supabase com conexão segura
+- Backup local no navegador de cada dispositivo
+- Sem rastreamento ou análise de dados pessoais
 
 ## 📝 Notas
 
-- Os cronómetros continuam a contar mesmo com a página de controlo fechada
-- A sincronização funciona em tempo real entre todas as abas abertas
-- O estado é preservado ao atualizar a página
-- Para redefinir tudo, limpe o localStorage do navegador
+- **Sessões**: Múltiplas sessões podem acontecer simultaneamente
+- **Sincronização**: Funciona entre qualquer número de dispositivos
+- **Offline**: Dados mantidos localmente como fallback
+- **Performance**: WebSocket garante latência mínima
+- **Limites**: Plano gratuito Supabase tem limites generosos para uso normal
 
 ---
 
