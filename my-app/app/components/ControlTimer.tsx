@@ -24,20 +24,34 @@ export default function ControlTimer({
 }: ControlTimerProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [tempName, setTempName] = useState(timer.name);
+  const [displayTime, setDisplayTime] = useState(timer.currentTime);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSyncRef = useRef<number>(Date.now());
 
-  // Atualizar cronómetro quando está em execução
+  // Atualizar o display time localmente sem broadcast
   useEffect(() => {
     if (timer.status === 'running' && timer.currentTime > 0) {
+      const startTime = Date.now();
+      const initialTime = timer.currentTime;
+      
       intervalRef.current = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - timer.lastUpdate) / 1000);
-        const newTime = Math.max(0, timer.currentTime - elapsed);
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const newTime = Math.max(0, initialTime - elapsed);
+        setDisplayTime(newTime);
         
-        if (newTime !== timer.currentTime) {
+        // Sincronizar a cada 1 segundo
+        if (newTime !== initialTime && Date.now() - lastSyncRef.current >= 1000) {
+          lastSyncRef.current = Date.now();
           onUpdateTime(timer.id, newTime);
+        }
+        
+        // Quando chegar a zero, parar
+        if (newTime === 0 && initialTime !== 0) {
+          onUpdateTime(timer.id, 0);
         }
       }, 100);
     } else {
+      setDisplayTime(timer.currentTime);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -49,7 +63,14 @@ export default function ControlTimer({
         clearInterval(intervalRef.current);
       }
     };
-  }, [timer.status, timer.currentTime, timer.lastUpdate, timer.id, onUpdateTime]);
+  }, [timer.status, timer.currentTime, timer.id, onUpdateTime]);
+
+  // Sincronizar displayTime quando timer.currentTime mudar externamente
+  useEffect(() => {
+    if (timer.status !== 'running') {
+      setDisplayTime(timer.currentTime);
+    }
+  }, [timer.currentTime, timer.status]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -138,7 +159,7 @@ export default function ControlTimer({
 
       <div className="text-center mb-3">
         <div className={`text-4xl font-bold font-mono ${timer.status === 'finished' ? 'text-destructive animate-pulse' : 'text-foreground'}`}>
-          {formatTime(timer.currentTime)}
+          {formatTime(displayTime)}
         </div>
         <div className="text-xs text-muted-foreground mt-1">
           Tempo inicial: {formatTime(timer.initialTime)}

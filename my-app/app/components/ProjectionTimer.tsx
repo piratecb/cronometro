@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TimerState } from '../hooks/useTimerSync';
 import { Play, Pause, Square, Bell } from 'lucide-react';
 
@@ -10,20 +10,22 @@ interface ProjectionTimerProps {
 }
 
 export default function ProjectionTimer({ timer, onUpdateTime }: ProjectionTimerProps) {
+  const [displayTime, setDisplayTime] = useState(timer.currentTime);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Atualizar cronómetro quando está em execução
+  // Atualizar o display time localmente sem broadcast
   useEffect(() => {
     if (timer.status === 'running' && timer.currentTime > 0) {
+      const startTime = Date.now();
+      const initialTime = timer.currentTime;
+      
       intervalRef.current = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - timer.lastUpdate) / 1000);
-        const newTime = Math.max(0, timer.currentTime - elapsed);
-        
-        if (newTime !== timer.currentTime) {
-          onUpdateTime(timer.id, newTime);
-        }
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const newTime = Math.max(0, initialTime - elapsed);
+        setDisplayTime(newTime);
       }, 100);
     } else {
+      setDisplayTime(timer.currentTime);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -35,7 +37,14 @@ export default function ProjectionTimer({ timer, onUpdateTime }: ProjectionTimer
         clearInterval(intervalRef.current);
       }
     };
-  }, [timer.status, timer.currentTime, timer.lastUpdate, timer.id, onUpdateTime]);
+  }, [timer.status, timer.currentTime]);
+
+  // Sincronizar displayTime quando timer.currentTime mudar externamente
+  useEffect(() => {
+    if (timer.status !== 'running') {
+      setDisplayTime(timer.currentTime);
+    }
+  }, [timer.currentTime, timer.status]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -71,7 +80,7 @@ export default function ProjectionTimer({ timer, onUpdateTime }: ProjectionTimer
       
       <div className="text-center">
         <div className={`text-7xl md:text-8xl lg:text-9xl font-bold font-mono tracking-wider ${timer.status === 'finished' ? 'animate-pulse' : ''}`}>
-          {formatTime(timer.currentTime)}
+          {formatTime(displayTime)}
         </div>
         
         {timer.status === 'finished' && (
