@@ -1,4 +1,4 @@
-# 🎯 Sistema de Gestão de Cronómetros Múltiplos
+# Sistema de Gestão de Cronómetros Múltiplos
 
 Aplicação web para gerir múltiplos cronómetros simultaneamente, ideal para apresentações de equipa, debates ou assembleias onde é necessário controlar o tempo de intervenção de diferentes participantes.
 
